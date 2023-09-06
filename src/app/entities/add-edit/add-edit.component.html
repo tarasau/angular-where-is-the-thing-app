@@ -1,0 +1,43 @@
+<form (ngSubmit)="onSubmit()" ngNativeValidate>
+    <div class="form-group col px-0">
+        <label>Type</label>
+        <select
+            class="form-control"
+            id="type"
+            name="type"
+            required
+            [(ngModel)]="entity.type"
+        >
+            <option *ngFor="let type of entityTypes" [value]="type">
+                {{ type }}
+            </option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="description">Description</label>
+        <input
+            [(ngModel)]="entity.description"
+            name="description"
+            type="text"
+            required
+            class="form-control"
+            id="description"
+            placeholder="enter a description"
+        />
+    </div>
+    <div class="form-group">
+        <label for="volume">Volume</label>
+        <input
+            [(ngModel)]="entity.volume"
+            name="volume"
+            type="number"
+            [disabled]="!isAddMode"
+            required
+            class="form-control"
+            id="volume"
+            placeholder="enter a volume (in cubic centimeters)"
+        />
+    </div>
+    <button type="submit" class="me-1 btn btn-primary">Submit</button>
+    <a [routerLink]="['/entities']" class="btn btn-success">Cancel</a>
+</form>

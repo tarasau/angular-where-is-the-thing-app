@@ -1,0 +1,196 @@
+<div class="container-fluid px-0 row">
+    <div class="col-md-6">
+        <h1>Where Is The Thing App</h1>
+        <hr />
+        <br />
+
+        <p>
+            You logged in <em>{{ user?.email }}!</em>
+        </p>
+
+        <h3>Available Entities</h3>
+        <a routerLink="add" class="btn btn-sm btn-success mb-2 mr-2"
+            >Add Entity</a
+        >
+        <a routerLink="put" class="btn btn-sm btn-success mb-2">Put Entity</a>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Type</th>
+                    <th>Volume</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-template
+                    #recursiveTable
+                    let-child="child"
+                    let-availableItems
+                >
+                    <ng-container *ngFor="let availableItem of availableItems">
+                        <tr>
+                            <td>{{ availableItem.id }}</td>
+                            <td>{{ availableItem.description }}</td>
+                            <td>{{ availableItem.type }}</td>
+                            <td>{{ availableItem.volume }}</td>
+                            <td style="white-space: nowrap">
+                                <a
+                                    routerLink="edit/{{ availableItem.id }}"
+                                    class="btn btn-sm btn-primary mr-1"
+                                    >Edit</a
+                                >
+                                <button
+                                    (click)="removeItem(availableItem.id)"
+                                    class="btn btn-sm btn-danger btn-delete-user"
+                                >
+                                    Delete
+                                </button>
+                            </td>
+                        </tr>
+                        <ng-container *ngIf="availableItem.items?.length > 0">
+                            <ng-container
+                                *ngTemplateOutlet="
+                                    recursiveTable;
+                                    context: {
+                                        $implicit: availableItem.items,
+                                        child: true
+                                    }
+                                "
+                            ></ng-container>
+                        </ng-container>
+                    </ng-container>
+                </ng-template>
+                <ng-container
+                    *ngTemplateOutlet="
+                        recursiveTable;
+                        context: { $implicit: availableItems, child: 0 }
+                    "
+                ></ng-container>
+                <!--            <tr *ngFor="let availableItem of availableItems">-->
+                <!--                <td>{{availableItem.id}}</td>-->
+                <!--                <td>{{availableItem.description}}</td>-->
+                <!--                <td>{{availableItem.type}}</td>-->
+                <!--                <td>{{availableItem.volume}}</td>-->
+                <!--                <td style="white-space: nowrap">-->
+                <!--                    <a routerLink="edit/{{availableItem.id}}" class="btn btn-sm btn-primary mr-1">Edit</a>-->
+                <!--                    <button (click)="removeItem(availableItem.id)" class="btn btn-sm btn-danger btn-delete-user">-->
+                <!--                        Delete-->
+                <!--                    </button>-->
+                <!--                </td>-->
+                <!--            </tr>-->
+                <tr *ngIf="!availableItems">
+                    <td colspan="4" class="text-center">
+                        <span
+                            class="spinner-border spinner-border-lg align-center"
+                        ></span>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!--        <div class="col px-0">-->
+        <!--            <h3>Available Entities</h3>-->
+        <!--            <table class="table table-striped table-dark">-->
+        <!--                <thead>-->
+        <!--                <tr>-->
+        <!--                    <th scope="col">Description</th>-->
+        <!--                    <th scope="col">Type</th>-->
+        <!--                    <th scope="col">Volume</th>-->
+        <!--                    <th scope="col">Actions</th>-->
+        <!--                </tr>-->
+        <!--                </thead>-->
+        <!--                <tbody>-->
+        <!--                <tr *ngFor="let availableItem of availableItems; let i = index">-->
+        <!--                    <th>{{availableItem.description}}</th>-->
+        <!--                    <td>{{availableItem.type}}</td>-->
+        <!--                    <td>{{availableItem.volume}}</td>-->
+        <!--                    <td>-->
+        <!--                        <span style="margin-right: 5px" (click)="editItem(i)">Edit</span>-->
+        <!--                        <span (click)="removeItem(i)">Remove</span>-->
+        <!--                    </td>-->
+        <!--                </tr>-->
+        <!--                </tbody>-->
+        <!--            </table>-->
+        <!--        </div>-->
+
+        <!--        <button class="btn btn-primary" (click)="add()">{{addEntity ? 'Hide' : 'Add'}}</button>-->
+
+        <!--        <form *ngIf="addEntity" (ngSubmit)="addEntitySubmit()" ngNativeValidate>-->
+
+        <!--            <div class="form-group">-->
+        <!--                <label for="type">Type</label>-->
+        <!--                <select-->
+        <!--                    id="type"-->
+        <!--                    name="type"-->
+        <!--                    required-->
+        <!--                    class="form-select form-select-lg mb-3"-->
+        <!--                    aria-label=".form-select-lg example"-->
+        <!--                    [(ngModel)]="entity.type">-->
+        <!--                    <option *ngFor="let type of entityTypes" [value]="type">{{type}}</option>-->
+        <!--                </select>-->
+        <!--            </div>-->
+        <!--            <div class="form-group">-->
+        <!--                <label for="description">Description</label>-->
+        <!--                <input-->
+        <!--                    [(ngModel)]="entity.description"-->
+        <!--                    name="description"-->
+        <!--                    type="text"-->
+        <!--                    required-->
+        <!--                    class="form-control"-->
+        <!--                    id="description"-->
+        <!--                    placeholder="enter a description">-->
+        <!--            </div>-->
+        <!--            <div class="form-group">-->
+        <!--                <label for="volume">Volume</label>-->
+        <!--                <input-->
+        <!--                    [(ngModel)]="entity.volume"-->
+        <!--                    name="volume"-->
+        <!--                    type="number"-->
+        <!--                    required-->
+        <!--                    class="form-control"-->
+        <!--                    id="volume"-->
+        <!--                    placeholder="enter a volume (in cubic centimeters)">-->
+        <!--            </div>-->
+        <!--            <button type="submit" class="me-1 btn btn-primary">Submit</button>-->
+        <!--            <a [routerLink]="['/']" class="btn btn-success">Cancel</a>-->
+        <!--        </form>-->
+
+        <div class="col px-0 mb-2">
+            <button class="btn btn-primary" (click)="logOut()">Log out</button>
+        </div>
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Available Items JSON</h5>
+                <pre>{{ availableItems | json }}</pre>
+            </div>
+        </div>
+
+        <br /><br /><br />
+
+        <div class="card" style="width: 18rem">
+            <div class="card-body">
+                <h5 class="card-title">Current User State</h5>
+                <ul>
+                    <li>
+                        <strong>isAuthenticated</strong> - {{ isAuthenticated }}
+                    </li>
+                    <li>
+                        <strong>user.email</strong> -
+                        {{ user?.email || "null" }}
+                    </li>
+                    <li>
+                        <strong>user.token</strong> -
+                        {{ user?.token || "null" }}
+                    </li>
+                    <li>
+                        <strong>errorMessage</strong> -
+                        {{ errorMessage || "null" }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

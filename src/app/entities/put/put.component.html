@@ -1,0 +1,39 @@
+<form (ngSubmit)="onSubmit()" ngNativeValidate>
+    <div class="form-group col px-0">
+        <label>Put</label>
+        <select
+            class="form-control"
+            id="put"
+            name="entity"
+            required
+            [(ngModel)]="entity"
+            (ngModelChange)="putEntityChange($event)"
+        >
+            <option *ngFor="let entity of entities" [ngValue]="entity">
+                {{ entity.description }}
+            </option>
+        </select>
+    </div>
+
+    <div class="form-group col px-0">
+        <label>Put Into</label>
+        <select
+            class="form-control"
+            id="putInto"
+            name="putInto"
+            required
+            [disabled]="!entity"
+            [(ngModel)]="putIntoEntity"
+        >
+            <option
+                *ngFor="let putIntoEntity of putIntoEntities"
+                [ngValue]="putIntoEntity"
+            >
+                {{ putIntoEntity.description }}
+            </option>
+        </select>
+    </div>
+
+    <button type="submit" class="me-1 btn btn-primary">Submit</button>
+    <a [routerLink]="['/entities']" class="btn btn-success">Cancel</a>
+</form>

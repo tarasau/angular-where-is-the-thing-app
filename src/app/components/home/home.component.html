@@ -1,0 +1,43 @@
+<div class="container-fluid px-0 row">
+    <div class="col-md-6">
+        <h1>Where Is The Thing App</h1>
+        <hr />
+        <br />
+
+        <div class="row">
+            <div class="col-2">
+                <a [routerLink]="['/log-in']" class="btn btn-primary">Log in</a>
+            </div>
+            <div class="col-2">
+                <a [routerLink]="['/sign-up']" class="btn btn-primary"
+                    >Sign up</a
+                >
+            </div>
+        </div>
+
+        <br /><br /><br />
+
+        <div class="card" style="width: 18rem">
+            <div class="card-body">
+                <h5 class="card-title">Current State</h5>
+                <ul>
+                    <li>
+                        <strong>isAuthenticated</strong> - {{ isAuthenticated }}
+                    </li>
+                    <li>
+                        <strong>user.email</strong> -
+                        {{ user?.email || "null" }}
+                    </li>
+                    <li>
+                        <strong>user.token</strong> -
+                        {{ user?.token || "null" }}
+                    </li>
+                    <li>
+                        <strong>errorMessage</strong> -
+                        {{ errorMessage || "null" }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectEntityState } from '../../store/app.states';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { EntityState } from '../../store/reducers/entity.reducers';
 import { Entity, EntityType } from '../../models/entity';
 import { UpdateAvailableEntities } from '../../store/actions/entity.actions';
@@ -11,25 +11,28 @@ import { UpdateAvailableEntities } from '../../store/actions/entity.actions';
     templateUrl: './put.component.html',
     styleUrls: ['./put.component.css'],
 })
-export class PutComponent implements OnInit {
+export class PutComponent implements OnInit, OnDestroy {
     getEntityState: Observable<EntityState>;
     entities: Entity[];
     putIntoEntities: Entity[];
     entity: Entity;
     putIntoEntity: Entity = new Entity();
     state: EntityState;
+    subscriptions: Subscription = new Subscription();
 
     constructor(private store: Store<AppState>) {
         this.getEntityState = this.store.select(selectEntityState);
     }
 
     ngOnInit(): void {
-        this.getEntityState.subscribe((state) => {
-            this.state = state;
-            this.entities = [...state.availableItems];
+        this.subscriptions.add(
+            this.getEntityState.subscribe((state) => {
+                this.state = state;
+                this.entities = [...state.availableItems];
 
-            this.getAvailableEntities();
-        });
+                this.getAvailableEntities();
+            }),
+        );
     }
 
     getAvailableEntities() {
@@ -129,5 +132,9 @@ export class PutComponent implements OnInit {
                 payload: this.putEntity(this.putIntoEntity.id),
             }),
         );
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribe();
     }
 }

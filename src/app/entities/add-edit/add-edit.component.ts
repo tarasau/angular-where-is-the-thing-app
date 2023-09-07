@@ -1,9 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Entity, EntityType } from '../../models/entity';
 import { UpdateAvailableEntities } from '../../store/actions/entity.actions';
 import { AppState, selectEntityState } from '../../store/app.states';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { EntityState } from '../../store/reducers/entity.reducers';
 import { Store } from '@ngrx/store';
 
@@ -12,7 +12,7 @@ import { Store } from '@ngrx/store';
     templateUrl: './add-edit.component.html',
     styleUrls: ['./add-edit.component.css'],
 })
-export class AddEditComponent implements OnInit {
+export class AddEditComponent implements OnInit, OnDestroy {
     id: string;
     isAddMode: boolean;
     entity: Entity = new Entity();
@@ -20,6 +20,7 @@ export class AddEditComponent implements OnInit {
     getEntityState: Observable<EntityState>;
     availableItems: Entity[];
     errorMessage: string;
+    subscriptions: Subscription = new Subscription();
 
     entityTypes: EntityType[] = [EntityType.THING, EntityType.CONTAINER];
 
@@ -34,10 +35,12 @@ export class AddEditComponent implements OnInit {
         this.id = this.route.snapshot.params['id'];
         this.isAddMode = !this.id;
 
-        this.getEntityState.subscribe((state) => {
-            this.availableItems = [...state.availableItems];
-            this.errorMessage = state.errorMessage;
-        });
+        this.subscriptions.add(
+            this.getEntityState.subscribe((state) => {
+                this.availableItems = [...state.availableItems];
+                this.errorMessage = state.errorMessage;
+            }),
+        );
 
         if (!this.isAddMode) {
             this.editedEntity = this.findEntity(this.availableItems);
@@ -61,7 +64,9 @@ export class AddEditComponent implements OnInit {
             this.availableItems = this.updateEntity();
         }
 
-        this.store.dispatch(UpdateAvailableEntities({ payload: this.availableItems }));
+        this.store.dispatch(
+            UpdateAvailableEntities({ payload: this.availableItems }),
+        );
     }
 
     findEntity(availableItems: Entity[]) {
@@ -99,5 +104,9 @@ export class AddEditComponent implements OnInit {
             }
             return availableItem;
         });
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribe();
     }
 }

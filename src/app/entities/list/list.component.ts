@@ -1,10 +1,14 @@
-import { Component, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, Subscription } from 'rxjs';
 import { AuthState } from '../../store/reducers/auth.reducers';
 import { EntityState } from '../../store/reducers/entity.reducers';
 import { Entity } from '../../models/entity';
 import { Store } from '@ngrx/store';
-import { AppState, selectAuthState, selectEntityState, } from '../../store/app.states';
+import {
+    AppState,
+    selectAuthState,
+    selectEntityState,
+} from '../../store/app.states';
 import { LogOut } from '../../store/actions/auth.actions';
 import { UpdateAvailableEntities } from '../../store/actions/entity.actions';
 import { User } from '../../models/user';
@@ -14,13 +18,14 @@ import { User } from '../../models/user';
     templateUrl: './list.component.html',
     styleUrls: ['./list.component.css'],
 })
-export class ListComponent implements OnInit {
+export class ListComponent implements OnInit, OnDestroy {
     getAuthState: Observable<AuthState>;
     getEntityState: Observable<EntityState>;
     isAuthenticated: boolean;
     errorMessage: string;
     user: User = new User();
     entity: Entity = new Entity();
+    subscriptions: Subscription = new Subscription();
 
     availableItems: Entity[];
 
@@ -30,16 +35,20 @@ export class ListComponent implements OnInit {
     }
 
     ngOnInit() {
-        this.getAuthState.subscribe((state) => {
-            this.isAuthenticated = state.isAuthenticated;
-            this.user = state.user;
-            this.errorMessage = state.errorMessage;
-        });
+        this.subscriptions.add(
+            this.getAuthState.subscribe((state) => {
+                this.isAuthenticated = state.isAuthenticated;
+                this.user = state.user;
+                this.errorMessage = state.errorMessage;
+            }),
+        );
 
-        this.getEntityState.subscribe((state) => {
-            this.availableItems = [...state.availableItems];
-            this.errorMessage = state.errorMessage;
-        });
+        this.subscriptions.add(
+            this.getEntityState.subscribe((state) => {
+                this.availableItems = [...state.availableItems];
+                this.errorMessage = state.errorMessage;
+            }),
+        );
     }
 
     logOut(): void {
@@ -70,7 +79,9 @@ export class ListComponent implements OnInit {
                         ...acc.items,
                         {
                             ...item,
-                            spentVolume: removedItem ? item.spentVolume - removedItem.volume : item.spentVolume,
+                            spentVolume: removedItem
+                                ? item.spentVolume - removedItem.volume
+                                : item.spentVolume,
                             items: newItems,
                         },
                     ],
@@ -85,7 +96,10 @@ export class ListComponent implements OnInit {
         return this.availableItems.reduce((acc, availableItem) => {
             const root = this.findEntityRoot([availableItem], id);
             if (root) {
-                return [...acc, ...this.deleteNested([availableItem], id).items];
+                return [
+                    ...acc,
+                    ...this.deleteNested([availableItem], id).items,
+                ];
             }
             return [...acc, availableItem];
         }, []);
@@ -119,5 +133,9 @@ export class ListComponent implements OnInit {
             }
         }
         return undefined;
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribe();
     }
 }

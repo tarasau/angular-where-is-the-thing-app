@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { User } from '../../models/user';
 import { AppState, selectAuthState } from '../../store/app.states';
 import { SignUp } from '../../store/actions/auth.actions';
@@ -10,19 +10,22 @@ import { SignUp } from '../../store/actions/auth.actions';
     templateUrl: './sign-up.component.html',
     styleUrls: ['./sign-up.component.css'],
 })
-export class SignUpComponent implements OnInit {
+export class SignUpComponent implements OnInit, OnDestroy {
     user: User = new User();
     getState: Observable<any>;
     errorMessage: string | null;
+    subscriptions: Subscription = new Subscription();
 
     constructor(private store: Store<AppState>) {
         this.getState = this.store.select(selectAuthState);
     }
 
     ngOnInit() {
-        this.getState.subscribe((state) => {
-            this.errorMessage = state.errorMessage;
-        });
+        this.subscriptions.add(
+            this.getState.subscribe((state) => {
+                this.errorMessage = state.errorMessage;
+            }),
+        );
     }
 
     onSubmit(): void {
@@ -32,5 +35,9 @@ export class SignUpComponent implements OnInit {
             password: this.user.password,
         };
         this.store.dispatch(SignUp({ payload }));
+    }
+
+    ngOnDestroy() {
+        this.subscriptions.unsubscribe();
     }
 }

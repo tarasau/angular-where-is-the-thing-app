@@ -8,10 +8,10 @@ import {
     AppState,
     selectAuthState,
     selectEntityState,
+    selectUser,
 } from '../../store/app.states';
 import { LogOut } from '../../store/actions/auth.actions';
 import { UpdateAvailableEntities } from '../../store/actions/entity.actions';
-import { User } from '../../models/user';
 
 @Component({
     selector: 'app-list',
@@ -23,25 +23,28 @@ export class ListComponent implements OnInit, OnDestroy {
     getEntityState: Observable<EntityState>;
     isAuthenticated: boolean;
     errorMessage: string;
-    user: User = new User();
+    // user: User = new User();
     entity: Entity = new Entity();
     subscriptions: Subscription = new Subscription();
 
     availableItems: Entity[];
 
     constructor(private store: Store<AppState>) {
-        this.getAuthState = this.store.select(selectAuthState);
+        // this.getAuthState = this.store.select(selectAuthState);
         this.getEntityState = this.store.select(selectEntityState);
     }
 
+    getAuthState$ = this.store.select(selectAuthState);
+    user$ = this.store.select(selectUser);
+
     ngOnInit() {
-        this.subscriptions.add(
-            this.getAuthState.subscribe((state) => {
-                this.isAuthenticated = state.isAuthenticated;
-                this.user = state.user;
-                this.errorMessage = state.errorMessage;
-            }),
-        );
+        // this.subscriptions.add(
+        //     this.getAuthState.subscribe((state) => {
+        //         this.isAuthenticated = state.isAuthenticated;
+        //         this.user = state.user;
+        //         this.errorMessage = state.errorMessage;
+        //     }),
+        // );
 
         this.subscriptions.add(
             this.getEntityState.subscribe((state) => {

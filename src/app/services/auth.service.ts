@@ -19,7 +19,7 @@ export class AuthService {
         return this.http.post<User>(url, { email, password });
     }
 
-    signUp(email: string, password: string): Observable<User> {
+    signUp(email: string, password: string): Observable<any> {
         const url = `${this.BASE_URL}/register`;
         return this.http.post<User>(url, { email, password });
     }

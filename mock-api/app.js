@@ -15,16 +15,16 @@ app.get('/ping', (req, res, next)  => {
 });
 
 app.post('/register', (req, res, next)  => {
-    if (req.body.email === 'test@test.com') {
+    // if (req.body.email === 'test@test.com') {
         res.status(201).json({
             status: 'success',
             token: '1234567'
         });
-    } else {
-        res.status(400).json({
-            status: 'error'
-        });
-    }
+    // } else {
+    //     res.status(400).json({
+    //         status: 'error'
+    //     });
+    // }
 });
 
 app.post('/login', (req, res, next) => {
@@ -35,7 +35,8 @@ app.post('/login', (req, res, next) => {
         });
     } else {
         res.status(400).json({
-            status: 'error'
+            status: 'error',
+            errorMessage: `User with email: ${req.body.email} not found. Please use test@test.com as an email`
         });
     }
 });

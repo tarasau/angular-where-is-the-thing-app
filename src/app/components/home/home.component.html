@@ -17,27 +17,7 @@
 
         <br /><br /><br />
 
-        <div class="card" style="width: 18rem">
-            <div class="card-body">
-                <h5 class="card-title">Current State</h5>
-                <ul>
-                    <li>
-                        <strong>isAuthenticated</strong> - {{ isAuthenticated }}
-                    </li>
-                    <li>
-                        <strong>user.email</strong> -
-                        {{ user?.email || "null" }}
-                    </li>
-                    <li>
-                        <strong>user.token</strong> -
-                        {{ user?.token || "null" }}
-                    </li>
-                    <li>
-                        <strong>errorMessage</strong> -
-                        {{ errorMessage || "null" }}
-                    </li>
-                </ul>
-            </div>
-        </div>
+        <app-current-state [authState]="getAuthState$ | async">
+        </app-current-state>
     </div>
 </div>

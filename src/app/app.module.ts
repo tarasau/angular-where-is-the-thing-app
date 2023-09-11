@@ -12,12 +12,16 @@ import { LogInComponent } from './components/log-in/log-in.component';
 import { AuthService } from './services/auth.service';
 import { AuthEffects } from './store/effects/auth.effects';
 import { reducers } from './store/app.states';
-import { ErrorInterceptor, TokenInterceptor, } from './services/token.interceptor';
+import {
+    ErrorInterceptor,
+    TokenInterceptor,
+} from './services/token.interceptor';
 import { AuthGuardService as AuthGuard } from './services/auth-guard.service';
 import { InitAuth } from './store/actions/auth.actions';
 import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { EntityEffects } from './store/effects/entity.effects';
 import { EntityService } from './services/entity.service';
+import { CurrentStateModule } from './components/current-state/current-state.module';
 
 const entitiesModule = () =>
     import('./entities/entities.module').then((x) => x.EntitiesModule);
@@ -33,6 +37,7 @@ const entitiesModule = () =>
         BrowserModule,
         FormsModule,
         HttpClientModule,
+        CurrentStateModule,
         StoreModule.forRoot(reducers, {}),
         EffectsModule.forRoot([AuthEffects, EntityEffects]),
         StoreDevtoolsModule.instrument({

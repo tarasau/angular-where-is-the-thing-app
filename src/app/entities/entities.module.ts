@@ -8,6 +8,7 @@ import { FormsModule } from '@angular/forms';
 import { PutComponent } from './put/put.component';
 import { Store } from '@ngrx/store';
 import { InitEntities } from '../store/actions/entity.actions';
+import { CurrentStateModule } from '../components/current-state/current-state.module';
 
 @NgModule({
     declarations: [
@@ -16,7 +17,12 @@ import { InitEntities } from '../store/actions/entity.actions';
         LayoutComponent,
         PutComponent,
     ],
-    imports: [CommonModule, EntitiesRoutingModule, FormsModule],
+    imports: [
+        CommonModule,
+        EntitiesRoutingModule,
+        FormsModule,
+        CurrentStateModule,
+    ],
 })
 export class EntitiesModule {
     constructor(store$: Store) {

@@ -1,0 +1,23 @@
+<div class="card" style="width: 18rem">
+    <div class="card-body">
+        <h5 class="card-title">Current State</h5>
+        <ul>
+            <li>
+                <strong>isAuthenticated</strong> -
+                {{ authState.isAuthenticated }}
+            </li>
+            <li>
+                <strong>user.email</strong> -
+                {{ authState.user?.email || "null" }}
+            </li>
+            <li>
+                <strong>user.token</strong> -
+                {{ authState.user?.token || "null" }}
+            </li>
+            <li>
+                <strong>errorMessage</strong> -
+                {{ authState.errorMessage || "null" }}
+            </li>
+        </ul>
+    </div>
+</div>

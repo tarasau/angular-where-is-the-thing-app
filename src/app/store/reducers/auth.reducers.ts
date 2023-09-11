@@ -28,7 +28,7 @@ export const AuthReducer = createReducer(
     })),
     on(AuthActions.LogInFailure, (state, { errorMessage }) => ({
         ...state,
-        errorMessage: 'Log In Failed',
+        errorMessage,
     })),
     on(AuthActions.SignUpSuccess, (state, { token, email }) => ({
         ...state,

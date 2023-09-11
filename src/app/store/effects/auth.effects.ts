@@ -23,9 +23,11 @@ export class AuthEffects {
                                 email: payload.email,
                             });
                         }),
-                        catchError((errorMessage) => {
+                        catchError((result) => {
                             return of(
-                                AuthActions.LogInFailure({ errorMessage }),
+                                AuthActions.LogInFailure({
+                                    errorMessage: result.error.errorMessage,
+                                }),
                             );
                         }),
                     );
@@ -58,15 +60,15 @@ export class AuthEffects {
                 return this.authService
                     .signUp(payload.email, payload.password)
                     .pipe(
-                        map((user: User) => {
+                        map((user) => {
                             return AuthActions.SignUpSuccess({
                                 token: user.token,
                                 email: payload.email,
                             });
                         }),
-                        catchError((errorMessage) => {
+                        catchError((result) => {
                             return of(
-                                AuthActions.SignUpFailure({ errorMessage }),
+                                AuthActions.SignUpFailure(result.errorMessage),
                             );
                         }),
                     );
@@ -74,12 +76,13 @@ export class AuthEffects {
         ),
     );
 
-    signUpSuccess$ = createEffect(() =>
+    signUpSuccess$ = createEffect(
+        () =>
             this.actions$.pipe(
                 ofType(AuthActions.SignUpSuccess),
                 tap((user) => {
                     localStorage.setItem('token', user.token);
-                    this.router.navigateByUrl('/entities');
+                    this.router.navigateByUrl('/log-in');
                 }),
             ),
         { dispatch: false },
@@ -89,14 +92,15 @@ export class AuthEffects {
         this.actions$.pipe(ofType(AuthActions.SignUpFailure)),
     );
 
-    logOut$ = createEffect(() =>
-        this.actions$.pipe(
-            ofType(AuthActions.LogOut),
-            tap((user) => {
-                localStorage.removeItem('token');
-                this.router.navigateByUrl('/');
-            }),
-        ),
+    logOut$ = createEffect(
+        () =>
+            this.actions$.pipe(
+                ofType(AuthActions.LogOut),
+                tap((user) => {
+                    localStorage.removeItem('token');
+                    this.router.navigateByUrl('/');
+                }),
+            ),
         { dispatch: false },
     );
 
@@ -112,7 +116,6 @@ export class AuthEffects {
                 return AuthActions.GetUserData({ token });
             }),
         ),
-        { dispatch: false },
     );
 
     getUserData$ = createEffect(() =>

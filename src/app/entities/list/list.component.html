@@ -26,12 +26,12 @@
             <tbody>
                 <ng-template
                     #recursiveTable
-                    let-child="child"
+                    let-indent="indent"
                     let-availableItems
                 >
                     <ng-container *ngFor="let availableItem of availableItems">
                         <tr>
-                            <td>{{ availableItem.id }}</td>
+                            <td [ngStyle]="{ 'padding-left': indent + 'rem' }">{{ availableItem.id }}</td>
                             <td>{{ availableItem.description }}</td>
                             <td>{{ availableItem.type }}</td>
                             <td>{{ availableItem.volume }}</td>
@@ -55,7 +55,7 @@
                                     recursiveTable;
                                     context: {
                                         $implicit: availableItem.items,
-                                        child: true
+                                        indent: indent + 1.5
                                     }
                                 "
                             ></ng-container>
@@ -65,7 +65,7 @@
                 <ng-container
                     *ngTemplateOutlet="
                         recursiveTable;
-                        context: { $implicit: availableItems, child: 0 }
+                        context: { $implicit: availableItems, indent: 0.75 }
                     "
                 ></ng-container>
                 <tr *ngIf="!availableItems">

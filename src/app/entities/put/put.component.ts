@@ -1,10 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState, selectEntityState } from '../../store/app.states';
-import { Observable, Subscription } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { EntityState } from '../../store/reducers/entity.reducers';
 import { Entity, EntityType } from '../../models/entity';
 import { UpdateAvailableEntities } from '../../store/actions/entity.actions';
+import { takeUntil, tap } from 'rxjs/operators';
 
 @Component({
     selector: 'app-put',
@@ -17,27 +18,28 @@ export class PutComponent implements OnInit, OnDestroy {
     putIntoEntities: Entity[];
     entity: Entity;
     putIntoEntity: Entity = new Entity();
-    state: EntityState;
-    subscriptions: Subscription = new Subscription();
 
     constructor(private store: Store<AppState>) {
         this.getEntityState = this.store.select(selectEntityState);
     }
 
-    ngOnInit(): void {
-        this.subscriptions.add(
-            this.getEntityState.subscribe((state) => {
-                this.state = state;
-                this.entities = [...state.availableItems];
+    getEntityState$ = this.store.select(selectEntityState);
+    destroyed = new Subject();
 
-                this.getAvailableEntities();
-            }),
-        );
+    ngOnInit(): void {
+        this.getEntityState$
+            .pipe(
+                tap(() => this.getAvailableEntities()),
+                takeUntil(this.destroyed),
+            )
+            .subscribe((entityState) => {
+                this.entities = [...entityState.availableItems];
+            });
     }
 
     getAvailableEntities() {
         this.putIntoEntities = this.flatAvailableEntities(
-            this.state.availableItems,
+            this.entities,
         ).filter((item) => item.type !== EntityType.THING);
     }
 
@@ -56,7 +58,7 @@ export class PutComponent implements OnInit, OnDestroy {
         return entities
             .map((entity) => {
                 if (entity.items && entity.items.length) {
-                    items = [...items, ...entity.items];
+                    items = [items, ...entity.items];
                 }
                 return entity;
             })
@@ -68,17 +70,17 @@ export class PutComponent implements OnInit, OnDestroy {
             const nestedItems = item.items || [];
             if (item.id === id) {
                 return [
-                    ...acc,
+                    acc,
                     {
-                        ...item,
+                        item,
                         spentVolume: item.spentVolume + this.entity.volume,
-                        items: [...nestedItems, this.entity],
+                        items: [nestedItems, this.entity],
                     },
                 ];
             }
             return [
-                ...acc,
-                { ...item, items: this.putNested(nestedItems, id) },
+                acc,
+                { item, items: this.putNested(nestedItems, id) },
             ];
         }, []);
     }
@@ -90,9 +92,9 @@ export class PutComponent implements OnInit, OnDestroy {
             }
             const root = this.findEntityRoot([entity], id);
             if (root) {
-                return [...acc, ...this.putNested([root], id)];
+                return [acc, this.putNested([root], id)];
             }
-            return [...acc, entity];
+            return [acc, entity];
         }, []);
     }
 
@@ -135,6 +137,7 @@ export class PutComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.subscriptions.unsubscribe();
+        this.destroyed.next();
+        this.destroyed.complete();
     }
 }

@@ -3,9 +3,9 @@ import { ActivatedRoute } from '@angular/router';
 import { Entity, EntityType } from '../../models/entity';
 import { UpdateAvailableEntities } from '../../store/actions/entity.actions';
 import { AppState, selectEntityState } from '../../store/app.states';
-import { Observable, Subscription } from 'rxjs';
-import { EntityState } from '../../store/reducers/entity.reducers';
+import { Subject } from 'rxjs';
 import { Store } from '@ngrx/store';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
     selector: 'app-add-edit',
@@ -17,35 +17,34 @@ export class AddEditComponent implements OnInit, OnDestroy {
     isAddMode: boolean;
     entity: Entity = new Entity();
     editedEntity: Entity;
-    getEntityState: Observable<EntityState>;
     availableItems: Entity[];
     errorMessage: string;
-    subscriptions: Subscription = new Subscription();
 
     entityTypes: EntityType[] = [EntityType.THING, EntityType.CONTAINER];
 
     constructor(
         private route: ActivatedRoute,
         private store: Store<AppState>,
-    ) {
-        this.getEntityState = this.store.select(selectEntityState);
-    }
+    ) {}
+
+    getEntityState$ = this.store.select(selectEntityState);
+    destroyed = new Subject();
 
     ngOnInit(): void {
         this.id = this.route.snapshot.params['id'];
         this.isAddMode = !this.id;
 
-        this.subscriptions.add(
-            this.getEntityState.subscribe((state) => {
-                this.availableItems = [...state.availableItems];
-                this.errorMessage = state.errorMessage;
-            }),
-        );
+        this.getEntityState$
+            .pipe(takeUntil(this.destroyed))
+            .subscribe((entityState) => {
+                this.availableItems = [...entityState.availableItems];
+                this.errorMessage = entityState.errorMessage;
 
-        if (!this.isAddMode) {
-            this.editedEntity = this.findEntity(this.availableItems);
-            this.entity = { ...this.editedEntity };
-        }
+                if (!this.isAddMode) {
+                    this.editedEntity = this.findEntity(this.availableItems);
+                    this.entity = { ...this.editedEntity };
+                }
+            });
     }
 
     onSubmit() {
@@ -107,6 +106,7 @@ export class AddEditComponent implements OnInit, OnDestroy {
     }
 
     ngOnDestroy() {
-        this.subscriptions.unsubscribe();
+        this.destroyed.next();
+        this.destroyed.complete();
     }
 }
